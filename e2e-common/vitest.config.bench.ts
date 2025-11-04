@@ -5,6 +5,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
     test: {
         include: ['**/*.bench.ts'],
+        globalSetup: path.join(__dirname, 'global-setup.ts'),
         /**
          * For local debugging of the e2e tests, we set a very long timeout value otherwise tests will
          * automatically fail for going over the 5 second default timeout.
