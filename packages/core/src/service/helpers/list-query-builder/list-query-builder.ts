@@ -595,20 +595,20 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
             return '>';
         } else if (clause.includes('<')) {
             return '<';
-        } else if (clause.includes(' IN ')) {
-            return 'IN';
         } else if (clause.includes(' NOT IN ')) {
             return 'NOT IN';
-        } else if (clause.includes(' ILIKE ')) {
-            return 'ILIKE';
+        } else if (clause.includes(' IN ')) {
+            return 'IN';
         } else if (clause.includes(' NOT LIKE ') || clause.includes(' NOT ILIKE ')) {
             return clause.includes('ILIKE') ? 'NOT ILIKE' : 'NOT LIKE';
+        } else if (clause.includes(' ILIKE ')) {
+            return 'ILIKE';
         } else if (clause.includes(' LIKE ')) {
             return 'LIKE';
-        } else if (clause.includes(' IS NULL')) {
-            return 'IS NULL';
         } else if (clause.includes(' IS NOT NULL')) {
             return 'IS NOT NULL';
+        } else if (clause.includes(' IS NULL')) {
+            return 'IS NULL';
         } else if (clause.includes(' BETWEEN ')) {
             return 'BETWEEN';
         }
