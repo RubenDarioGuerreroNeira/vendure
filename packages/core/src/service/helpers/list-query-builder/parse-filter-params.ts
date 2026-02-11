@@ -89,9 +89,9 @@ export interface ParseFilterParamsOptions<T extends VendureEntity> {
  * @description
  * Parses filter parameters from a GraphQL query and converts them into SQL WHERE conditions.
  *
- * For custom property fields that map to *-to-Many relations, all conditions will be marked
- * for EXISTS subquery treatment to ensure correct AND semantics when filtering across
- * multiple related rows.
+ * For custom property fields that map to relations, all conditions will be marked
+ * for EXISTS subquery treatment. This ensures correct AND semantics when filtering across
+ * multiple related rows (*-to-Many), and avoids unnecessary joins (ManyToOne).
  */
 export function parseFilterParams<T extends VendureEntity>(
     options: ParseFilterParamsOptions<T>,
@@ -109,8 +109,8 @@ export function parseFilterParams<T extends VendureEntity>(
     const dbType = connection.options.type;
     let argIndex = 1;
 
-    // Detect which custom property fields map to *-to-Many relations.
-    // All filter conditions on these fields will use EXISTS subqueries for correct AND semantics.
+    // Detect which custom property fields map to relations.
+    // All filter conditions on these fields will use EXISTS subqueries.
     const toManyRelationCustomProperties = getToManyRelationCustomProperties(
         connection,
         entity,
@@ -124,7 +124,7 @@ export function parseFilterParams<T extends VendureEntity>(
         const instruction = calculatedColumnDef?.listQuery;
         const calculatedColumnExpression = instruction?.expression;
 
-        // Mark ALL conditions on *-to-Many relation custom properties for EXISTS subquery treatment.
+        // Mark ALL conditions on relation custom properties for EXISTS subquery treatment.
         // This ensures correct AND semantics regardless of how many times the field is used.
         const isToManyCustomProperty =
             toManyRelationCustomProperties.has(key) && originalCustomPropertyMap?.[key];
@@ -145,7 +145,7 @@ export function parseFilterParams<T extends VendureEntity>(
             }
             const condition = buildWhereCondition(fieldName, operator as Operator, operand, argIndex, dbType);
 
-            // Mark *-to-Many custom property fields for EXISTS subquery treatment
+            // Mark relation custom property fields for EXISTS subquery treatment
             if (isToManyCustomProperty) {
                 condition.isExistsCondition = {
                     customPropertyKey: key,
@@ -180,9 +180,9 @@ export function parseFilterParams<T extends VendureEntity>(
 
 /**
  * @description
- * Identifies which custom property keys map to *-to-Many relations (OneToMany or ManyToMany).
- * These fields require EXISTS subqueries for correct AND semantics when filtering across
- * multiple related rows.
+ * Identifies which custom property keys map to relations (OneToMany, ManyToMany or ManyToOne).
+ * These fields require EXISTS subqueries for correct AND semantics (in the case of *-to-Many)
+ * or to avoid unnecessary JOINs (in the case of ManyToOne).
  *
  * @see https://github.com/vendurehq/vendure/issues/3267
  */
@@ -214,7 +214,10 @@ function getToManyRelationCustomProperties<T extends VendureEntity>(
         const relationName = pathParts[0];
         const relationMetadata = metadata.findRelationWithPropertyPath(relationName);
 
-        if (relationMetadata && (relationMetadata.isOneToMany || relationMetadata.isManyToMany)) {
+        if (
+            relationMetadata &&
+            (relationMetadata.isOneToMany || relationMetadata.isManyToMany || relationMetadata.isManyToOne)
+        ) {
             toManyProperties.add(property);
         }
     }

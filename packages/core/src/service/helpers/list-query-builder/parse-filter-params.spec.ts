@@ -8,6 +8,10 @@ import { VendureEntity } from '../../../entity/base/base.entity';
 import { parseFilterParams, WhereCondition, WhereGroup } from './parse-filter-params';
 import { MockConnection } from './parse-sort-params.spec';
 
+class Asset extends VendureEntity {
+    name: string;
+}
+
 class Product extends VendureEntity {
     name: string;
     slug: string;
@@ -15,6 +19,7 @@ class Product extends VendureEntity {
     createdAt: Date;
     available: boolean;
     image: string;
+    featuredAsset: Asset;
 }
 
 class ProductTranslation extends VendureEntity {
@@ -115,6 +120,41 @@ describe('parseFilterParams()', () => {
         expect(isWhereCondition(first) && first.parameters).toEqual({ arg1: 'foo' });
         expect(isWhereCondition(second) && second.clause).toBe('product.id = :arg2');
         expect(isWhereCondition(second) && second.parameters).toEqual({ arg2: '123' });
+    });
+
+    it('flags ManyToOne custom properties for EXISTS subquery', () => {
+        const connection = new MockConnection();
+        connection.setColumns(Product, [{ propertyName: 'id' }]);
+        connection.setRelations(Product, [
+            {
+                propertyName: 'featuredAsset',
+                type: Asset,
+                isManyToOne: true,
+                isOneToMany: false,
+                isManyToMany: false,
+            } as any,
+        ]);
+
+        const filterParams: FilterParameter<Product> = {
+            // @ts-ignore
+            assetName: { eq: 'test' },
+        };
+        const customPropertyMap = { assetName: 'featuredAsset.name' };
+        const originalCustomPropertyMap = { assetName: 'featuredAsset.name' };
+
+        const result = parseFilterParams({
+            connection: connection as any,
+            entity: Product,
+            filterParams,
+            customPropertyMap,
+            originalCustomPropertyMap,
+        });
+
+        const condition = result[0] as WhereCondition;
+        expect(condition.isExistsCondition).toEqual({
+            customPropertyKey: 'assetName',
+            customPropertyPath: 'featuredAsset.name',
+        });
     });
 
     describe('string operators', () => {

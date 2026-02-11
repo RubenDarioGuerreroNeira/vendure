@@ -555,6 +555,9 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
                 return null;
             }
             const foreignKeyColumn = joinColumns[0].databaseName;
+            if (!foreignKeyColumn) {
+                return null;
+            }
 
             const whereCondition = this.buildWhereConditionClause(
                 relatedAlias,
@@ -571,7 +574,7 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
                 WHERE ${escapeId(relatedAlias)}.${escapeId('id')} = ${escapeId(mainQb.alias)}.${escapeId(foreignKeyColumn)} AND ${whereCondition}
             )`;
         } else {
-            // Not a *-to-Many relation, shouldn't happen but fall back gracefully
+            // Unhandled relation type (e.g. OneToOne), fall back gracefully
             return null;
         }
 

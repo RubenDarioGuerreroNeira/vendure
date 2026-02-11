@@ -166,10 +166,14 @@ export class MockConnection {
         this.relationsMap.set(entity, value);
     }
     getMetadata = (entity: Type<any>) => {
+        const relations = this.relationsMap.get(entity) || [];
         return {
             name: entity.name,
             columns: this.columnsMap.get(entity) || [],
-            relations: this.relationsMap.get(entity) || [],
+            relations,
+            findRelationWithPropertyPath: (propertyPath: string) => {
+                return relations.find(r => r.propertyName === propertyPath);
+            },
         };
     };
     namingStrategy = new DefaultNamingStrategy();
