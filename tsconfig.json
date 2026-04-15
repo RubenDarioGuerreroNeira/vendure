@@ -4,7 +4,10 @@
     "moduleResolution": "NodeNext",
     "noLib": false,
     "skipLibCheck": true,
-    "lib": ["es2019", "esnext.asynciterable"],
+    "lib": [
+      "es2019",
+      "esnext.asynciterable"
+    ],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
@@ -14,6 +17,7 @@
     "strictPropertyInitialization": false,
     "sourceMap": false,
     "newLine": "LF",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noEmit": true
   }
 }

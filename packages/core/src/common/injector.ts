@@ -1,7 +1,5 @@
 import { Type } from '@nestjs/common';
 import { ContextId, ModuleRef } from '@nestjs/core';
-import { getConnectionToken } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
 
 /**
  * @description
@@ -13,7 +11,7 @@ import { Connection } from 'typeorm';
  * @docsCategory common
  */
 export class Injector {
-    constructor(private moduleRef: ModuleRef) {}
+    constructor(private moduleRef?: ModuleRef) {}
 
     /**
      * @description
@@ -21,6 +19,9 @@ export class Injector {
      * Wraps the Nestjs `ModuleRef.get()` method.
      */
     get<T, R = T>(typeOrToken: Type<T> | string | symbol): R {
+        if (!this.moduleRef) {
+            throw new Error('ModuleRef is not defined in this Injector');
+        }
         return this.moduleRef.get(typeOrToken, { strict: false });
     }
 
@@ -31,6 +32,9 @@ export class Injector {
      * Wraps the Nestjs `ModuleRef.resolve()` method.
      */
     resolve<T, R = T>(typeOrToken: Type<T> | string | symbol, contextId?: ContextId): Promise<R> {
+        if (!this.moduleRef) {
+            throw new Error('ModuleRef is not defined in this Injector');
+        }
         return this.moduleRef.resolve(typeOrToken, contextId, { strict: false });
     }
 }

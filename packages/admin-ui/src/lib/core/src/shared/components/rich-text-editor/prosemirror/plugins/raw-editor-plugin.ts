@@ -70,7 +70,7 @@ export const rawEditorPlugin = (contextMenuService: ContextMenuService, modalSer
                                                                     topLevelNodePos,
                                                                     topLevelNodePos +
                                                                         (topLevelNode?.nodeSize ?? 0),
-                                                                    parsedNodeSlice,
+                                                                    parsedNodeSlice as any,
                                                                 );
                                                             } catch (err: any) {
                                                                 // eslint-disable-next-line no-console

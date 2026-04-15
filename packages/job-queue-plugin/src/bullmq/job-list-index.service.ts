@@ -26,9 +26,8 @@ import { getPrefix } from './utils';
 @Injectable()
 export class JobListIndexService {
     private readonly BATCH_SIZE = 100;
-    private redis: Redis | Cluster;
-    private queue: Queue | undefined;
-    private queueEvents: QueueEvents | undefined;
+    private redis: any;
+    private queue: Queue | undefined;    private queueEvents: QueueEvents | undefined;
     private allStates: JobType[] = [
         'wait',
         'active',
@@ -52,7 +51,7 @@ export class JobListIndexService {
     register(redisConnection: Redis | Cluster, queue: Queue) {
         this.redis = redisConnection;
         this.queue = queue;
-        this.queueEvents = new QueueEvents(queue.name, { connection: redisConnection });
+        this.queueEvents = new QueueEvents(queue.name, { connection: redisConnection as any });
         this.setupEventListeners();
         void this.migrateExistingJobs();
     }
@@ -270,17 +269,17 @@ export class JobListIndexService {
 
                 if (elements.length > 0) {
                     // Extract job IDs from the elements (they come as [score, id] pairs)
-                    const jobIds = elements.filter((_, i) => i % 2 === 0);
+                    const jobIds = elements.filter((_: string | number, i: number) => i % 2 === 0);
 
                     // Check existence of jobs directly in Redis
                     const pipeline = this.redis.pipeline();
                     for (const jobId of jobIds) {
-                        pipeline.exists(this.createQueueItemKey(jobId));
+                        pipeline.exists(this.createQueueItemKey(jobId as string));
                     }
                     const existsResults = await pipeline.exec();
 
                     // Filter out non-existent jobs
-                    const jobsToRemove = jobIds.filter((jobId, i) => {
+                    const jobsToRemove = jobIds.filter((jobId: string | number, i: number) => {
                         const exists = existsResults?.[i]?.[1] === 1;
                         return !exists;
                     });

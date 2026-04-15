@@ -76,34 +76,34 @@ export function buildKeymap(schema: Schema, mapKeys?: Keymap) {
 
     type = schema.marks.strong;
     if (type) {
-        bind('Mod-b', toggleMark(type));
-        bind('Mod-B', toggleMark(type));
+        bind('Mod-b', toggleMark(type as any));
+        bind('Mod-B', toggleMark(type as any));
     }
 
     type = schema.marks.em;
     if (type) {
-        bind('Mod-i', toggleMark(type));
-        bind('Mod-I', toggleMark(type));
+        bind('Mod-i', toggleMark(type as any));
+        bind('Mod-I', toggleMark(type as any));
     }
 
     type = schema.marks.code;
     if (type) {
-        bind('Mod-`', toggleMark(type));
+        bind('Mod-`', toggleMark(type as any));
     }
 
     type = schema.nodes.bullet_list;
     if (type) {
-        bind('Shift-Ctrl-8', wrapInList(type));
+        bind('Shift-Ctrl-8', wrapInList(type as any));
     }
 
     type = schema.nodes.ordered_list;
     if (type) {
-        bind('Shift-Ctrl-9', wrapInList(type));
+        bind('Shift-Ctrl-9', wrapInList(type as any));
     }
 
     type = schema.nodes.blockquote;
     if (type) {
-        bind('Ctrl->', wrapIn(type));
+        bind('Ctrl->', wrapIn(type as any));
     }
 
     type = schema.nodes.hard_break;
@@ -111,7 +111,7 @@ export function buildKeymap(schema: Schema, mapKeys?: Keymap) {
         const br = type;
         const cmd = chainCommands(exitCode, (state, dispatch) => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            dispatch!(state.tr.replaceSelectionWith(br.create()).scrollIntoView());
+            dispatch!(state.tr.replaceSelectionWith(br.create()).scrollIntoView() as any);
             return true;
         });
         bind('Mod-Enter', cmd);
@@ -123,25 +123,25 @@ export function buildKeymap(schema: Schema, mapKeys?: Keymap) {
 
     type = schema.nodes.list_item;
     if (type) {
-        bind('Enter', splitListItem(type));
-        bind('Mod-[', liftListItem(type));
-        bind('Mod-]', sinkListItem(type));
+        bind('Enter', splitListItem(type as any));
+        bind('Mod-[', liftListItem(type as any));
+        bind('Mod-]', sinkListItem(type as any));
     }
 
     type = schema.nodes.paragraph;
     if (type) {
-        bind('Shift-Ctrl-0', setBlockType(type));
+        bind('Shift-Ctrl-0', setBlockType(type as any));
     }
 
     type = schema.nodes.code_block;
     if (type) {
-        bind('Shift-Ctrl-\\', setBlockType(type));
+        bind('Shift-Ctrl-\\', setBlockType(type as any));
     }
 
     type = schema.nodes.heading;
     if (type) {
         for (let i = 1; i <= 6; i++) {
-            bind('Shift-Ctrl-' + i, setBlockType(type, { level: i }));
+            bind('Shift-Ctrl-' + i, setBlockType(type as any, { level: i }));
         }
     }
 
@@ -149,7 +149,7 @@ export function buildKeymap(schema: Schema, mapKeys?: Keymap) {
     if (type) {
         const hr = type;
         bind('Mod-_', (state, dispatch) => {
-            dispatch(state.tr.replaceSelectionWith(hr.create()).scrollIntoView());
+            dispatch(state.tr.replaceSelectionWith(hr.create()).scrollIntoView() as any);
             return true;
         });
     }

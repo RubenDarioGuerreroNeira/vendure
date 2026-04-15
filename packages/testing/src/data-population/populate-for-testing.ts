@@ -2,6 +2,9 @@
 import { INestApplicationContext } from '@nestjs/common';
 import { LanguageCode } from '@vendure/common/lib/generated-types';
 import { ConfigService, isInspectableJobQueueStrategy, VendureConfig } from '@vendure/core';
+
+// @ts-ignore
+
 import { importProductsFromCsv, populateCollections, populateInitialData } from '@vendure/core/cli';
 
 import { TestServerOptions } from '../types';
@@ -84,11 +87,11 @@ async function populateProducts(
 
     const importResult = await importProductsFromCsv(app, productsCsvPath, LanguageCode.en);
     if (importResult.errors && importResult.errors.length) {
-        console.log(`${importResult.errors.length} errors encountered when importing product data:`);
+        console.log(`${String(importResult.errors.length)} errors encountered when importing product data:`);
         console.log(importResult.errors.join('\n'));
     }
 
     if (logging) {
-        console.log(`\nImported ${importResult.imported} products`);
+        console.log(`\nImported ${String(importResult.imported)} products`);
     }
 }

@@ -8281,6 +8281,81 @@ export type DuplicateEntityMutation = {
     duplicateEntity: { message: string; duplicationError: string } | { newEntityId: string };
 };
 
+export type PaymentMethodTestFragment = {
+    id: string;
+    code: string;
+    name: string;
+    description: string;
+    enabled: boolean;
+    checker?: { code: string; args: Array<{ name: string; value: string }> } | null;
+    handler: { code: string; args: Array<{ name: string; value: string }> };
+    translations: Array<{ id: string; languageCode: LanguageCode; name: string; description: string }>;
+};
+
+export type CreatePaymentMethodEventTestMutationVariables = Exact<{
+    input: CreatePaymentMethodInput;
+}>;
+
+export type CreatePaymentMethodEventTestMutation = {
+    createPaymentMethod: {
+        id: string;
+        code: string;
+        name: string;
+        description: string;
+        enabled: boolean;
+        checker?: { code: string; args: Array<{ name: string; value: string }> } | null;
+        handler: { code: string; args: Array<{ name: string; value: string }> };
+        translations: Array<{ id: string; languageCode: LanguageCode; name: string; description: string }>;
+    };
+};
+
+export type UpdatePaymentMethodEventTestMutationVariables = Exact<{
+    input: UpdatePaymentMethodInput;
+}>;
+
+export type UpdatePaymentMethodEventTestMutation = {
+    updatePaymentMethod: {
+        id: string;
+        code: string;
+        name: string;
+        description: string;
+        enabled: boolean;
+        checker?: { code: string; args: Array<{ name: string; value: string }> } | null;
+        handler: { code: string; args: Array<{ name: string; value: string }> };
+        translations: Array<{ id: string; languageCode: LanguageCode; name: string; description: string }>;
+    };
+};
+
+export type UpdatePromotionEventTestMutationVariables = Exact<{
+    input: UpdatePromotionInput;
+}>;
+
+export type UpdatePromotionEventTestMutation = {
+    updatePromotion:
+        | { errorCode: ErrorCode; message: string }
+        | {
+              id: string;
+              createdAt: any;
+              updatedAt: any;
+              couponCode?: string | null;
+              startsAt?: any | null;
+              endsAt?: any | null;
+              name: string;
+              description: string;
+              enabled: boolean;
+              perCustomerUsageLimit?: number | null;
+              usageLimit?: number | null;
+              conditions: Array<{ code: string; args: Array<{ name: string; value: string }> }>;
+              actions: Array<{ code: string; args: Array<{ name: string; value: string }> }>;
+              translations: Array<{
+                  id: string;
+                  languageCode: LanguageCode;
+                  name: string;
+                  description: string;
+              }>;
+          };
+};
+
 export type IdTest1QueryVariables = Exact<{ [key: string]: never }>;
 
 export type IdTest1Query = { products: { items: Array<{ id: string }> } };
@@ -12218,6 +12293,40 @@ export type GetProductWithVariantListQuery = {
     } | null;
 };
 
+export type OrderWithModsPromoSideEffectsFragment = {
+    id: string;
+    state: string;
+    lines: Array<{ id: string; quantity: number }>;
+    modifications: Array<{ id: string; priceChange: number }>;
+    promotions: Array<{ id: string; couponCode?: string | null }>;
+};
+
+export type ModifyOrderPromoSideEffectsMutationVariables = Exact<{
+    input: ModifyOrderInput;
+}>;
+
+export type ModifyOrderPromoSideEffectsMutation = {
+    modifyOrder:
+        | { errorCode: ErrorCode; message: string }
+        | { errorCode: ErrorCode; message: string }
+        | { errorCode: ErrorCode; message: string }
+        | { errorCode: ErrorCode; message: string }
+        | { errorCode: ErrorCode; message: string }
+        | { errorCode: ErrorCode; message: string }
+        | { errorCode: ErrorCode; message: string }
+        | {
+              id: string;
+              state: string;
+              lines: Array<{ id: string; quantity: number }>;
+              modifications: Array<{ id: string; priceChange: number }>;
+              promotions: Array<{ id: string; couponCode?: string | null }>;
+          }
+        | { errorCode: ErrorCode; message: string }
+        | { errorCode: ErrorCode; message: string }
+        | { errorCode: ErrorCode; message: string }
+        | { errorCode: ErrorCode; message: string };
+};
+
 export type GetPromotionListQueryVariables = Exact<{
     options?: InputMaybe<PromotionListOptions>;
 }>;
@@ -12967,6 +13076,81 @@ export type RemoveMembersFromZoneMutation = {
     };
 };
 
+export const PaymentMethodTestFragmentDoc = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'PaymentMethodTest' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'PaymentMethod' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'enabled' } },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'checker' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'args' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'handler' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'args' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'translations' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'languageCode' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<PaymentMethodTestFragment, unknown>;
 export const ProdFragmentFragmentDoc = {
     kind: 'Document',
     definitions: [
@@ -15533,6 +15717,56 @@ export const PaymentMethodFragmentDoc = {
         },
     ],
 } as unknown as DocumentNode<PaymentMethodFragment, unknown>;
+export const OrderWithModsPromoSideEffectsFragmentDoc = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'OrderWithModsPromoSideEffects' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Order' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'state' } },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'lines' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'quantity' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'modifications' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'priceChange' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'promotions' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'couponCode' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<OrderWithModsPromoSideEffectsFragment, unknown>;
 export const ConfigurableOperationDefFragmentDoc = {
     kind: 'Document',
     definitions: [
@@ -22612,6 +22846,386 @@ export const DuplicateEntityDocument = {
         },
     ],
 } as unknown as DocumentNode<DuplicateEntityMutation, DuplicateEntityMutationVariables>;
+export const CreatePaymentMethodEventTestDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'CreatePaymentMethodEventTest' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                    type: {
+                        kind: 'NonNullType',
+                        type: {
+                            kind: 'NamedType',
+                            name: { kind: 'Name', value: 'CreatePaymentMethodInput' },
+                        },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createPaymentMethod' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'input' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'PaymentMethodTest' },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'PaymentMethodTest' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'PaymentMethod' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'enabled' } },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'checker' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'args' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'handler' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'args' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'translations' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'languageCode' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<
+    CreatePaymentMethodEventTestMutation,
+    CreatePaymentMethodEventTestMutationVariables
+>;
+export const UpdatePaymentMethodEventTestDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'UpdatePaymentMethodEventTest' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                    type: {
+                        kind: 'NonNullType',
+                        type: {
+                            kind: 'NamedType',
+                            name: { kind: 'Name', value: 'UpdatePaymentMethodInput' },
+                        },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updatePaymentMethod' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'input' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'PaymentMethodTest' },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'PaymentMethodTest' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'PaymentMethod' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'enabled' } },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'checker' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'args' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'handler' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                                {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'args' },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'translations' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'languageCode' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<
+    UpdatePaymentMethodEventTestMutation,
+    UpdatePaymentMethodEventTestMutationVariables
+>;
+export const UpdatePromotionEventTestDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'UpdatePromotionEventTest' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                    type: {
+                        kind: 'NonNullType',
+                        type: { kind: 'NamedType', name: { kind: 'Name', value: 'UpdatePromotionInput' } },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updatePromotion' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'input' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'FragmentSpread', name: { kind: 'Name', value: 'Promotion' } },
+                                {
+                                    kind: 'InlineFragment',
+                                    typeCondition: {
+                                        kind: 'NamedType',
+                                        name: { kind: 'Name', value: 'ErrorResult' },
+                                    },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'errorCode' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'ConfigurableOperation' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'ConfigurableOperation' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'args' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+                            ],
+                        },
+                    },
+                    { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'Promotion' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Promotion' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'couponCode' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'startsAt' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'endsAt' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'enabled' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'perCustomerUsageLimit' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'usageLimit' } },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'conditions' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'ConfigurableOperation' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'actions' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'ConfigurableOperation' },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'translations' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'languageCode' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<UpdatePromotionEventTestMutation, UpdatePromotionEventTestMutationVariables>;
 export const IdTest1Document = {
     kind: 'Document',
     definitions: [
@@ -37669,6 +38283,113 @@ export const GetProductWithVariantListDocument = {
         },
     ],
 } as unknown as DocumentNode<GetProductWithVariantListQuery, GetProductWithVariantListQueryVariables>;
+export const ModifyOrderPromoSideEffectsDocument = {
+    kind: 'Document',
+    definitions: [
+        {
+            kind: 'OperationDefinition',
+            operation: 'mutation',
+            name: { kind: 'Name', value: 'ModifyOrderPromoSideEffects' },
+            variableDefinitions: [
+                {
+                    kind: 'VariableDefinition',
+                    variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                    type: {
+                        kind: 'NonNullType',
+                        type: { kind: 'NamedType', name: { kind: 'Name', value: 'ModifyOrderInput' } },
+                    },
+                },
+            ],
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'modifyOrder' },
+                        arguments: [
+                            {
+                                kind: 'Argument',
+                                name: { kind: 'Name', value: 'input' },
+                                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+                            },
+                        ],
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                {
+                                    kind: 'FragmentSpread',
+                                    name: { kind: 'Name', value: 'OrderWithModsPromoSideEffects' },
+                                },
+                                {
+                                    kind: 'InlineFragment',
+                                    typeCondition: {
+                                        kind: 'NamedType',
+                                        name: { kind: 'Name', value: 'ErrorResult' },
+                                    },
+                                    selectionSet: {
+                                        kind: 'SelectionSet',
+                                        selections: [
+                                            { kind: 'Field', name: { kind: 'Name', value: 'errorCode' } },
+                                            { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            kind: 'FragmentDefinition',
+            name: { kind: 'Name', value: 'OrderWithModsPromoSideEffects' },
+            typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Order' } },
+            selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                    { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                    { kind: 'Field', name: { kind: 'Name', value: 'state' } },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'lines' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'quantity' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'modifications' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'priceChange' } },
+                            ],
+                        },
+                    },
+                    {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'promotions' },
+                        selectionSet: {
+                            kind: 'SelectionSet',
+                            selections: [
+                                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                                { kind: 'Field', name: { kind: 'Name', value: 'couponCode' } },
+                            ],
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+} as unknown as DocumentNode<
+    ModifyOrderPromoSideEffectsMutation,
+    ModifyOrderPromoSideEffectsMutationVariables
+>;
 export const GetPromotionListDocument = {
     kind: 'Document',
     definitions: [

@@ -36,7 +36,7 @@ registerInitializer('mariadb', new MysqlInitializer());
 
 export const testConfig = () => {
     const index = getIndexOfTestFileInParentDir();
-    return mergeConfig(defaultTestConfig, {
+    return mergeConfig(defaultTestConfig as any, {
         apiOptions: {
             port: getBasePort() + index,
         },
@@ -85,13 +85,19 @@ function getCallerFilename(depth: number): string {
     let file: any;
     let frame: any;
 
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     const pst = Error.prepareStackTrace;
-    Error.prepareStackTrace = (_, _stack) => {
-        Error.prepareStackTrace = pst;
-        return _stack;
-    };
+    if (typeof pst === 'function') {
+        Error.prepareStackTrace = (_, _stack) => {
+            Error.prepareStackTrace = pst;
+            return _stack;
+        };
+    }
 
     stack = new Error().stack;
+    if (typeof pst === 'function') {
+        Error.prepareStackTrace = pst;
+    }
     stack = stack.slice(depth + 1);
 
     do {

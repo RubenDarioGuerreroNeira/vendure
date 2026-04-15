@@ -28,6 +28,7 @@ concurrency:
 
 jobs:
     deploy:
+        if: false # Deshabilitado temporalmente
         runs-on: ubuntu-latest
         permissions:
             contents: read

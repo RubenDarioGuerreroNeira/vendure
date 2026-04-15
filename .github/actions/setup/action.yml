@@ -1,4 +1,5 @@
 name: 'Setup Vendure'
+# Triggering CI after package-lock restoration
 description: 'Setup Node with npm cache and install dependencies'
 inputs:
     node-version:
@@ -15,5 +16,5 @@ runs:
         - name: Install dependencies
           shell: bash
           run: |
-              npm install
-              npm install --os=linux --cpu=x64 sharp
+              npm install --legacy-peer-deps
+              npm install --os=linux --cpu=x64 sharp --legacy-peer-deps

@@ -121,7 +121,7 @@ export class GlobalSettingsResolver {
                 });
         }
 
-        return exposedCustomFieldConfig as GraphQLCustomFields;
+        return exposedCustomFieldConfig as unknown as GraphQLCustomFields;
     }
 
     private generateEntityCustomFieldConfig(info: GraphQLResolveInfo): EntityCustomFields[] {

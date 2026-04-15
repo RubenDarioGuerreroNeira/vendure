@@ -1,10 +1,15 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../cli"
+    "outDir": "../cli",
+    "rootDir": "../src/cli",
+    "noEmit": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "files": [
     "../src/cli/index.ts",
+    "../src/cli/populate.ts",
     "../typings.d.ts"
   ]
 }

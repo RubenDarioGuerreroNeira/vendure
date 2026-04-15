@@ -1041,4 +1041,74 @@ export class CollectionService implements OnModuleInit {
             )
             .then(collections => collections.map(collection => this.translator.translate(collection, ctx)));
     }
+
+    /**
+     * @description
+     * Returns a Map of collection IDs to their associated product variants.
+     * This performs a single bulk query to get all variants for all provided collection IDs,
+     * avoiding N+1 query issues when resolving variants on multiple collections.
+     */
+    async getProductVariantsForCollections(
+        ctx: RequestContext,
+        collectionIds: ID[],
+        options?: ListQueryOptions<ProductVariant>,
+        relations?: RelationPaths<ProductVariant>,
+    ): Promise<Map<string, ProductVariant[]>> {
+        if (collectionIds.length === 0) {
+            return new Map();
+        }
+
+        const qb = this.listQueryBuilder.build(
+            ProductVariant,
+            { take: undefined, skip: undefined },
+            {
+                relations: relations ?? ['taxCategory'],
+                channelId: ctx.channelId,
+                where: { deletedAt: IsNull() },
+                ctx,
+            },
+        );
+
+        // We explicitly join with the product to ensure we filter out soft-deleted products,
+        // matching the behavior of other collection-related variant queries.
+        qb.innerJoin('productvariant.product', 'product')
+            .innerJoin('productvariant.collections', 'collection', 'collection.id IN (:...collectionIds)', {
+                collectionIds,
+            })
+            .andWhere('product.deletedAt IS NULL')
+            .addSelect('collection.id', 'collectionId')
+            // Using an explicit alias for the variant ID to avoid fragility of auto-generated aliases.
+            .addSelect('productvariant.id', 'variantId');
+
+        const { entities: allVariants, raw: rawResults } = await qb.getRawAndEntities();
+
+        // High-performance mapping using a Map for variant lookup (O(1))
+        const variantsById = new Map<string, ProductVariant>(allVariants.map(v => [String(v.id), v]));
+
+        const variantsByCollectionId = new Map<string, ProductVariant[]>();
+        const seenInCollection = new Map<string, Set<string>>();
+
+        for (const id of collectionIds) {
+            const idStr = String(id);
+            variantsByCollectionId.set(idStr, []);
+            seenInCollection.set(idStr, new Set());
+        }
+
+        for (const raw of rawResults) {
+            const variantId = String(raw.variantId);
+            const collectionId = String(raw.collectionId);
+            const variant = variantsById.get(variantId);
+
+            if (variant) {
+                const collectionVariants = variantsByCollectionId.get(collectionId);
+                const seenSet = seenInCollection.get(collectionId);
+                if (collectionVariants && seenSet && !seenSet.has(variantId)) {
+                    seenSet.add(variantId);
+                    collectionVariants.push(variant);
+                }
+            }
+        }
+
+        return variantsByCollectionId;
+    }
 }

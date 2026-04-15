@@ -7,7 +7,10 @@
     "removeComments": true,
     "strictPropertyInitialization": false,
     "sourceMap": true,
-    "allowJs": true
+    "allowJs": true,
+    "noEmit": true
   },
-  "exclude": ["dist/**/*"]
+  "exclude": [
+    "dist/**/*"
+  ]
 }

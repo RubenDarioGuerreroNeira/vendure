@@ -7,6 +7,7 @@ export {
 } from '@vendure/common/lib/generated-types';
 export * from '@vendure/common/lib/shared-types';
 export * from './api/index';
+// export * from './app.module'; // This line is not needed here if AppModule is re-exported explicitly below
 export * from './bootstrap';
 export * from './cache/index';
 export * from './common/index';
@@ -26,3 +27,4 @@ export * from './scheduler/index';
 export * from './service/index';
 export { VENDURE_VERSION } from './version';
 export * from './worker/index';
+export { AppModule } from './app.module';

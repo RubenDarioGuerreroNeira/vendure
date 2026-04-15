@@ -29,7 +29,7 @@ export interface ClarityIconOptions {
     label?: string;
 }
 
-export function renderClarityIcon(options: ClarityIconOptions): (view: EditorView) => HTMLElement {
+export function renderClarityIcon(options: ClarityIconOptions): (view: EditorView) => any {
     return (view: EditorView) => {
         const icon = document.createElement('clr-icon');
         icon.setAttribute('shape', options.shape);

@@ -10,14 +10,25 @@ import { PaginatedList } from '@vendure/common/lib/shared-types';
 import { RequestContextCacheService } from '../../../cache/request-context-cache.service';
 import { Translated } from '../../../common/types/locale-types';
 import { idsAreEqual } from '../../../common/utils';
-import { Asset, Channel, FacetValue, Product, ProductOption, StockLevel, TaxRate } from '../../../entity';
+import {
+    Asset,
+    Channel,
+    FacetValue,
+    Product,
+    ProductOption,
+    StockLevel,
+    TaxCategory,
+    TaxRate,
+} from '../../../entity';
 import { ProductVariant } from '../../../entity/product-variant/product-variant.entity';
 import { StockMovement } from '../../../entity/stock-movement/stock-movement.entity';
+import { EntityHydrator } from '../../../service/helpers/entity-hydrator/entity-hydrator.service';
 import { LocaleStringHydrator } from '../../../service/helpers/locale-string-hydrator/locale-string-hydrator';
 import { AssetService } from '../../../service/services/asset.service';
 import { ProductVariantService } from '../../../service/services/product-variant.service';
 import { StockLevelService } from '../../../service/services/stock-level.service';
 import { StockMovementService } from '../../../service/services/stock-movement.service';
+import { TaxCategoryService } from '../../../service/services/tax-category.service';
 import { ApiType } from '../../common/get-api-type';
 import { RequestContext } from '../../common/request-context';
 import { Api } from '../../decorators/api.decorator';
@@ -30,6 +41,8 @@ export class ProductVariantEntityResolver {
         private assetService: AssetService,
         private localeStringHydrator: LocaleStringHydrator,
         private requestContextCache: RequestContextCacheService,
+        private taxCategoryService: TaxCategoryService,
+        private entityHydrator: EntityHydrator,
     ) {}
 
     @ResolveField()
@@ -72,6 +85,15 @@ export class ProductVariantEntityResolver {
         @Parent() productVariant: ProductVariant,
     ): Promise<TaxRate> {
         return this.productVariantService.hydratePriceFields(ctx, productVariant, 'taxRateApplied');
+    }
+
+    @ResolveField()
+    async taxCategory(
+        @Ctx() ctx: RequestContext,
+        @Parent() productVariant: ProductVariant,
+    ): Promise<TaxCategory | undefined> {
+        await this.entityHydrator.hydrate(ctx, productVariant, { relations: ['taxCategory'] });
+        return productVariant.taxCategory;
     }
 
     @ResolveField()

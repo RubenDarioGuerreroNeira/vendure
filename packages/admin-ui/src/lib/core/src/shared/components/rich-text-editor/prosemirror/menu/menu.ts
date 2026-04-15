@@ -48,7 +48,7 @@ function cmdItem(cmd: (...args: any[]) => void, options: CmdItemOptions) {
 function markItem(markType, options: CmdItemOptions) {
     const passedOptions = {
         active(state) {
-            return markActive(state, markType);
+            return markActive(state, markType as any);
         },
         enable: true,
     };
@@ -56,11 +56,11 @@ function markItem(markType, options: CmdItemOptions) {
     for (const prop in options) {
         passedOptions[prop] = options[prop];
     }
-    return cmdItem(toggleMark(markType), passedOptions);
+    return cmdItem(toggleMark(markType as any), passedOptions);
 }
 
 function wrapListItem(nodeType, options: CmdItemOptions) {
-    return cmdItem(wrapInList(nodeType, options.attrs), options);
+    return cmdItem(wrapInList(nodeType as any, options.attrs), options);
 }
 
 // :: (Schema) → Object
@@ -174,7 +174,7 @@ export function buildMenuItems(schema: Schema, modalService: ModalService) {
 
     type = schema.nodes.blockquote;
     if (type) {
-        r.wrapBlockQuote = wrapItem(type, {
+        r.wrapBlockQuote = wrapItem(type as any, {
             title: 'Wrap in block quote',
             render: renderClarityIcon({ shape: 'block-quote', size: IconSize.Large }),
         });
@@ -182,7 +182,7 @@ export function buildMenuItems(schema: Schema, modalService: ModalService) {
 
     type = schema.nodes.paragraph;
     if (type) {
-        r.makeParagraph = blockTypeItem(type, {
+        r.makeParagraph = blockTypeItem(type as any, {
             title: 'Change to paragraph',
             render: renderClarityIcon({ shape: 'text', label: 'Plain' }),
         });
@@ -190,7 +190,7 @@ export function buildMenuItems(schema: Schema, modalService: ModalService) {
 
     type = schema.nodes.code_block;
     if (type) {
-        r.makeCodeBlock = blockTypeItem(type, {
+        r.makeCodeBlock = blockTypeItem(type as any, {
             title: 'Change to code block',
             render: renderClarityIcon({ shape: 'code', label: 'Code' }),
         });
@@ -199,7 +199,7 @@ export function buildMenuItems(schema: Schema, modalService: ModalService) {
     type = schema.nodes.heading;
     if (type) {
         for (let i = 1; i <= 10; i++) {
-            r['makeHead' + i] = blockTypeItem(type, {
+            r['makeHead' + i] = blockTypeItem(type as any, {
                 title: 'Change to heading ' + i,
                 label: 'Level ' + i,
                 attrs: { level: i },
@@ -220,10 +220,10 @@ export function buildMenuItems(schema: Schema, modalService: ModalService) {
                 return wrapInMenuItemWithIcon(icon, labelEl);
             },
             enable(state) {
-                return canInsert(state, hr);
+                return canInsert(state, hr as any);
             },
             run(state: EditorState, dispatch) {
-                dispatch(state.tr.replaceSelectionWith(hr.create()));
+                dispatch(state.tr.replaceSelectionWith(hr.create() as any));
             },
         });
     }

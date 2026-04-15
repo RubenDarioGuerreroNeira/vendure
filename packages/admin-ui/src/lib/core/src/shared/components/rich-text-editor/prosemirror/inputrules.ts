@@ -63,27 +63,27 @@ export function buildInputRules(schema: Schema): Plugin {
 
     type = schema.nodes.blockquote;
     if (type) {
-        rules.push(blockQuoteRule(type));
+        rules.push(blockQuoteRule(type as any));
     }
 
     type = schema.nodes.ordered_list;
     if (type) {
-        rules.push(orderedListRule(type));
+        rules.push(orderedListRule(type as any));
     }
 
     type = schema.nodes.bullet_list;
     if (type) {
-        rules.push(bulletListRule(type));
+        rules.push(bulletListRule(type as any));
     }
 
     type = schema.nodes.code_block;
     if (type) {
-        rules.push(codeBlockRule(type));
+        rules.push(codeBlockRule(type as any));
     }
 
     type = schema.nodes.heading;
     if (type) {
-        rules.push(headingRule(type, 6));
+        rules.push(headingRule(type as any, 6));
     }
 
     return inputRules({ rules });

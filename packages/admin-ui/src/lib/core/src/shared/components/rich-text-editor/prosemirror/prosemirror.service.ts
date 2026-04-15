@@ -38,11 +38,11 @@ export class ProsemirrorService {
     // Mix the nodes from prosemirror-schema-list into the basic schema to
     // create a schema with list support.
     private mySchema = new Schema({
-        nodes: addListNodes(schema.spec.nodes, 'paragraph block*', 'block')
+        nodes: addListNodes(schema.spec.nodes as any, 'paragraph block*', 'block')
             .append(getTableNodes() as any)
-            .update('image', imageNode)
-            .addToEnd('iframe', iframeNode),
-        marks: schema.spec.marks.update('link', linkMark),
+            .update('image', imageNode as any)
+            .addToEnd('iframe', iframeNode as any),
+        marks: (schema.spec.marks as any).update('link', linkMark as any),
     });
     private enabled = true;
     /**
@@ -92,9 +92,9 @@ export class ProsemirrorService {
             if (text !== currentText) {
                 let state = this.getStateFromText(text);
                 if (document.body.contains(this.editorView.dom)) {
-                    const fix = fixTables(state);
+                    const fix = fixTables(state as any);
                     if (fix) {
-                        state = state.apply(fix.setMeta('addToHistory', false));
+                        state = state.apply(fix.setMeta('addToHistory', false) as any);
                     }
                     this.editorView.updateState(state);
                 }
@@ -123,15 +123,15 @@ export class ProsemirrorService {
         const div = doc.createElement('div');
         div.innerHTML = text ?? '';
         return EditorState.create({
-            doc: DOMParser.fromSchema(this.mySchema).parse(div),
-            plugins: this.configurePlugins({ schema: this.mySchema, floatingMenu: false }),
+            doc: DOMParser.fromSchema(this.mySchema as any).parse(div),
+            plugins: this.configurePlugins({ schema: this.mySchema as any, floatingMenu: false }),
         });
     }
 
     private getTextFromState(state: EditorState): string {
         const doc = this.getDetachedDoc();
         const div = doc.createElement('div');
-        const fragment = DOMSerializer.fromSchema(this.mySchema).serializeFragment(state.doc.content);
+        const fragment = DOMSerializer.fromSchema(this.mySchema as any).serializeFragment(state.doc.content);
 
         div.appendChild(fragment);
 
@@ -140,21 +140,21 @@ export class ProsemirrorService {
 
     private configurePlugins(options: SetupOptions) {
         const plugins = [
-            buildInputRules(options.schema),
-            keymap(buildKeymap(options.schema, options.mapKeys)),
+            buildInputRules(options.schema as any),
+            keymap(buildKeymap(options.schema as any, options.mapKeys)),
             keymap(baseKeymap),
             dropCursor(),
             gapCursor(),
             linkSelectPlugin,
-            columnResizing({}),
-            tableEditing({ allowTableNodeSelection: true }),
+            columnResizing({}) as any,
+            tableEditing({ allowTableNodeSelection: true }) as any,
             tableContextMenuPlugin(this.contextMenuService),
             imageContextMenuPlugin(this.contextMenuService, this.injector.get(ModalService)),
             rawEditorPlugin(this.contextMenuService, this.injector.get(ModalService)),
             customMenuPlugin({
                 floatingMenu: options.floatingMenu,
                 injector: this.injector,
-                schema: options.schema,
+                schema: options.schema as any,
             }),
         ];
         if (options.history !== false) {

@@ -76,19 +76,19 @@ export const tableContextMenuPlugin = (contextMenuService: ContextMenuService) =
                             element: node,
                             coords: view.coordsAtPos(tableNodePos),
                             items: [
-                                createMenuItem('Insert column before', addColumnBefore, 'add-column'),
-                                createMenuItem('Insert column after', addColumnAfter, 'add-column'),
-                                createMenuItem('Insert row before', addRowBefore, 'add-row'),
-                                createMenuItem('Insert row after', addRowAfter, 'add-row'),
-                                createMenuItem('Merge cells', mergeCells),
-                                createMenuItem('Split cell', splitCell),
+                                createMenuItem('Insert column before', addColumnBefore as any, 'add-column'),
+                                createMenuItem('Insert column after', addColumnAfter as any, 'add-column'),
+                                createMenuItem('Insert row before', addRowBefore as any, 'add-row'),
+                                createMenuItem('Insert row after', addRowAfter as any, 'add-row'),
+                                createMenuItem('Merge cells', mergeCells as any),
+                                createMenuItem('Split cell', splitCell as any),
                                 separator,
-                                createMenuItem('Toggle header column', toggleHeaderColumn),
-                                createMenuItem('Toggle header row', toggleHeaderRow),
+                                createMenuItem('Toggle header column', toggleHeaderColumn as any),
+                                createMenuItem('Toggle header row', toggleHeaderRow as any),
                                 separator,
-                                createMenuItem('Delete column', deleteColumn),
-                                createMenuItem('Delete row', deleteRow),
-                                createMenuItem('Delete table', deleteTable),
+                                createMenuItem('Delete column', deleteColumn as any),
+                                createMenuItem('Delete row', deleteRow as any),
+                                createMenuItem('Delete table', deleteTable as any),
                             ],
                         });
                     }
@@ -135,7 +135,7 @@ export function getTableMenu(schema: Schema) {
 
     function separator(): MenuElement {
         return new MenuItem({
-            select: state => isInTable(state),
+            select: state => isInTable(state as any),
             run: state => {
                 /**/
             },
@@ -148,20 +148,20 @@ export function getTableMenu(schema: Schema) {
     }
 
     return [
-        item('Insert column before', addColumnBefore),
-        item('Insert column after', addColumnAfter),
-        item('Insert row before', addRowBefore),
-        item('Insert row after', addRowAfter),
-        item('Merge cells', mergeCells),
-        item('Split cell', splitCell),
+        item('Insert column before', addColumnBefore as any),
+        item('Insert column after', addColumnAfter as any),
+        item('Insert row before', addRowBefore as any),
+        item('Insert row after', addRowAfter as any),
+        item('Merge cells', mergeCells as any),
+        item('Split cell', splitCell as any),
         separator(),
-        item('Toggle header column', toggleHeaderColumn),
-        item('Toggle header row', toggleHeaderRow),
-        item('Toggle header cells', toggleHeaderCell),
+        item('Toggle header column', toggleHeaderColumn as any),
+        item('Toggle header row', toggleHeaderRow as any),
+        item('Toggle header cells', toggleHeaderCell as any),
         separator(),
-        item('Delete column', deleteColumn),
-        item('Delete row', deleteRow),
-        item('Delete table', deleteTable),
+        item('Delete column', deleteColumn as any),
+        item('Delete row', deleteRow as any),
+        item('Delete table', deleteTable as any),
     ];
 }
 
@@ -169,7 +169,7 @@ export function addTable(state, dispatch, { rowsCount, colsCount, withHeaderRow,
     const offset = state.tr.selection.anchor + 1;
 
     const nodes = createTable(state, rowsCount, colsCount, withHeaderRow, cellContent);
-    const tr = state.tr.replaceSelectionWith(nodes).scrollIntoView();
+    const tr = state.tr.replaceSelectionWith(nodes as any).scrollIntoView();
     const resolvedPos = tr.doc.resolve(offset);
 
     tr.setSelection(TextSelection.near(resolvedPos));
@@ -178,24 +178,24 @@ export function addTable(state, dispatch, { rowsCount, colsCount, withHeaderRow,
 }
 
 function createTable(state, rowsCount, colsCount, withHeaderRow, cellContent) {
-    const types = tableNodeTypes(state.schema);
+    const types = tableNodeTypes(state.schema as any);
     const headerCells: Node[] = [];
     const cells: Node[] = [];
     const createCell = (cellType, _cellContent) =>
-        _cellContent ? cellType.createChecked(null, _cellContent) : cellType.createAndFill();
+        _cellContent ? cellType.createChecked(null, _cellContent as any) : cellType.createAndFill();
 
     for (let index = 0; index < colsCount; index += 1) {
         const cell = createCell(types.cell, cellContent);
 
         if (cell) {
-            cells.push(cell);
+            cells.push(cell as any);
         }
 
         if (withHeaderRow) {
             const headerCell = createCell(types.header_cell, cellContent);
 
             if (headerCell) {
-                headerCells.push(headerCell);
+                headerCells.push(headerCell as any);
             }
         }
     }
@@ -203,8 +203,8 @@ function createTable(state, rowsCount, colsCount, withHeaderRow, cellContent) {
     const rows: Node[] = [];
 
     for (let index = 0; index < rowsCount; index += 1) {
-        rows.push(types.row.createChecked(null, withHeaderRow && index === 0 ? headerCells : cells));
+        rows.push(types.row.createChecked(null, (withHeaderRow && index === 0 ? headerCells : cells) as any) as any);
     }
 
-    return types.table.createChecked(null, rows);
+    return types.table.createChecked(null, rows as any);
 }

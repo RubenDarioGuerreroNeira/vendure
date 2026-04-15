@@ -59,6 +59,8 @@ jobs:
               run: npm install
               env:
                   CI: true
+            - name: Build packages
+              run: npm run build
             - name: Publish to Verdaccio
               run: |
                   nohup verdaccio --config $HOME/.config/verdaccio/config.yaml &

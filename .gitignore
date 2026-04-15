@@ -9,8 +9,14 @@
 .idea/**/tasks.xml
 .idea/dictionaries
 .env
+.gemini/
+error.txt.txt
+nul
+packages/core/*.backup
 lerna-debug.log
 dist
+lib/
+package/
 e2e/__data__/*
 docs/resources/_gen/*
 docs/static/main.js*

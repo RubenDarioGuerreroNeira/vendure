@@ -10,9 +10,10 @@ import {
 } from '@opentelemetry/sdk-logs';
 import { NodeSDKConfiguration } from '@opentelemetry/sdk-node';
 import { BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+
 // Deep import is intentional: otherwise unwanted code (such as instrumented classes) will get
 // loaded too early before the Otel instrumentation has had a chance to do its thing.
-import { ENABLE_INSTRUMENTATION_ENV_VAR } from '@vendure/core/dist/common/instrument-decorator';
+import { ENABLE_INSTRUMENTATION_ENV_VAR } from '../../core/dist/common/instrument-decorator';
 
 const traceExporter = new OTLPTraceExporter();
 const logExporter = new OTLPLogExporter();

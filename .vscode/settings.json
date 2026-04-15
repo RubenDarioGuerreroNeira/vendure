@@ -22,5 +22,9 @@
     "sonarlint.connectedMode.project": {
         "connectionId": "vendure-ecommerce",
         "projectKey": "vendure-ecommerce_vendure"
+    },
+    "chat.tools.terminal.autoApprove": {
+        "git add": true,
+        "git commit": true
     }
 }

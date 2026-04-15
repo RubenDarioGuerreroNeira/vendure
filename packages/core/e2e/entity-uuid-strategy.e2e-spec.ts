@@ -6,7 +6,7 @@ import { UuidIdStrategy } from '@vendure/core';
 // recursive evaluation of all imported files. This tests
 // the resilience of the id strategy implementation to the
 // order of file evaluation.
-import '@vendure/core/dist/index';
+import '@vendure/core';
 import { createTestEnvironment } from '@vendure/testing';
 import path from 'path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';

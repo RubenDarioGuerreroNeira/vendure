@@ -1,5 +1,4 @@
-import { VendureConfig } from '@vendure/core';
-import { preBootstrapConfig } from '@vendure/core/dist/bootstrap';
+import { VendureConfig, preBootstrapConfig } from '@vendure/core';
 import { createConnection } from 'typeorm';
 
 /* eslint-disable no-console */

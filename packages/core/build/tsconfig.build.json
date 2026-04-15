@@ -3,8 +3,15 @@
     "compilerOptions": {
         "removeComments": false,
         "outDir": "../dist",
-        "rootDirs": ["../src"]
+        "rootDir": "../src",
+        "rootDirs": ["../src"],
+        "noEmit": false
     },
     "exclude": ["../package.json"],
-    "files": ["../src/index.ts", "../typings.d.ts"]
+    "files": [
+        "../src/index.ts",
+        "../typings.d.ts",
+        "../src/common/configurable-operation.ts",
+        "../src/common/error/generated-graphql-shop-errors.ts"
+    ]
 }

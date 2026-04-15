@@ -19,7 +19,10 @@ export class AssetImporter {
     private assetMap = new Map<string, Asset>();
 
     /** @internal */
-    constructor(private configService: ConfigService, private assetService: AssetService) {}
+    constructor(
+        private configService: ConfigService,
+        private assetService: AssetService,
+    ) {}
 
     /**
      * @description
@@ -46,8 +49,8 @@ export class AssetImporter {
                         if (isGraphQlErrorResult(asset)) {
                             errors.push(asset.message);
                         } else {
-                            this.assetMap.set(assetPath, asset as Asset);
-                            assets.push(asset as Asset);
+                            this.assetMap.set(assetPath, asset as any as Asset);
+                            assets.push(asset as any as Asset);
                         }
                     }
                 } catch (e: any) {
