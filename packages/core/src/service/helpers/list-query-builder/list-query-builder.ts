@@ -21,6 +21,7 @@ import {
     SortParameter,
     UserInputError,
 } from '../../../common';
+import { InternalServerError } from '../../../common/error/errors';
 import { Instrument } from '../../../common/instrument-decorator';
 import { ConfigService, CustomFields, Logger } from '../../../config';
 import { TransactionalConnection } from '../../../connection';
@@ -437,7 +438,7 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
         const { customPropertyPath } = condition.isExistsCondition;
         const pathParts = customPropertyPath.split('.');
 
-        if (pathParts.length < 2) {
+        if (pathParts.length !== 2) {
             return null;
         }
 
@@ -480,7 +481,10 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
         // Helper to escape identifiers for the current database driver (handles PostgreSQL quoting)
         const escapeId = (name: string) => mainQb.connection.driver.escape(name);
         const escapeTablePath = (path: string) =>
-            path.split('.').map(segment => mainQb.connection.driver.escape(segment)).join('.');
+            path
+                .split('.')
+                .map(segment => mainQb.connection.driver.escape(segment))
+                .join('.');
 
         let existsQuery: string;
 
@@ -553,9 +557,31 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
                 SELECT 1 FROM ${escapeTablePath(inverseTableName)} ${escapeId(relatedAlias)}
                 WHERE ${escapeId(relatedAlias)}.${escapeId(foreignKeyColumn)} = ${escapeId(mainQb.alias)}.${escapeId('id')} AND ${whereCondition}
             )`;
+        } else if (relation.isManyToOne) {
+            const relatedAlias = aliasBase;
+            const joinColumns = relation.joinColumns;
+            if (!joinColumns || joinColumns.length === 0) {
+                return null;
+            }
+            const foreignKeyColumn = joinColumns[0].databaseName;
+            if (!foreignKeyColumn) {
+                return null;
+            }
+            const whereCondition = this.buildWhereConditionClause(
+                relatedAlias,
+                columnName,
+                comparisonOperator,
+                newParamKey,
+                escapeId,
+            );
+            existsQuery = `EXISTS (
+                SELECT 1 FROM ${escapeTablePath(inverseTableName)} ${escapeId(relatedAlias)}
+                WHERE ${escapeId(mainQb.alias)}.${escapeId(foreignKeyColumn)} = ${escapeId(relatedAlias)}.${escapeId('id')} AND ${whereCondition}
+            )`;
         } else {
-            // Not a *-to-Many relation, shouldn't happen but fall back gracefully
-            return null;
+            throw new InternalServerError(
+                `Cannot build EXISTS subquery for custom property field: relation type not supported`,
+            );
         }
 
         return {
@@ -739,6 +765,14 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
                     delete customPropertyMap[property];
                     return;
                 }
+
+                // For ManyToOne relations, skip the JOIN and normalization.
+                // These relations are handled via EXISTS subqueries in parseFilterParams,
+                // so we keep the original path in the customPropertyMap for EXISTS generation.
+                if (relationMetadata.isManyToOne) {
+                    break;
+                }
+
                 const alias = `${entityMetadata.tableName}_${relationMetadata.propertyName}`;
                 if (!this.isRelationAlreadyJoined(qb, alias)) {
                     qb.leftJoinAndSelect(`${entityAlias}.${relationMetadata.propertyName}`, alias);
@@ -753,7 +787,12 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
                     entityAlias = alias;
                 }
             }
-            customPropertyMap[property] = normalizedRelationPath.slice(-2).join('.');
+            // Only update the customPropertyMap if we completed normalization.
+            // For ManyToOne relations (where we broke out of the loop), the original
+            // path is retained so that EXISTS subqueries can use it.
+            if (normalizedRelationPath.length > 0) {
+                customPropertyMap[property] = normalizedRelationPath.slice(-2).join('.');
+            }
         }
     }
 

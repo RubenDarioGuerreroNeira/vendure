@@ -207,14 +207,17 @@ function getToManyRelationCustomProperties<T extends VendureEntity>(
 
         // Parse the path to get the relation name (e.g., 'facetValues.id' -> 'facetValues')
         const pathParts = path.split('.');
-        if (pathParts.length < 2) {
+        if (pathParts.length !== 2) {
             continue;
         }
 
         const relationName = pathParts[0];
         const relationMetadata = metadata.findRelationWithPropertyPath(relationName);
 
-        if (relationMetadata && (relationMetadata.isOneToMany || relationMetadata.isManyToMany)) {
+        if (
+            relationMetadata &&
+            (relationMetadata.isOneToMany || relationMetadata.isManyToMany || relationMetadata.isManyToOne)
+        ) {
             toManyProperties.add(property);
         }
     }
