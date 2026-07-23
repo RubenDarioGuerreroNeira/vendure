@@ -215,7 +215,7 @@ function getToManyRelationCustomProperties<T extends VendureEntity>(
         const relationName = pathParts[0];
         const relationMetadata = metadata.findRelationWithPropertyPath(relationName);
 
-        if (relationMetadata && (relationMetadata.isOneToMany || relationMetadata.isManyToMany)) {
+        if (relationMetadata && (relationMetadata.isOneToMany || relationMetadata.isManyToMany || relationMetadata.isManyToOne)) {
             toManyProperties.add(property);
         }
     }
