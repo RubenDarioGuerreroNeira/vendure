@@ -39,7 +39,7 @@ import { EventBus } from '../../event-bus/event-bus';
 import { CollectionEvent } from '../../event-bus/events/collection-event';
 import { CollectionModificationEvent } from '../../event-bus/events/collection-modification-event';
 import { ProductEvent } from '../../event-bus/events/product-event';
-import { ProductVariantEvent } from '../../event-bus/events/product-variant-event';
+import { ProductVariantEvent } from '../../event-bus/events/product-event';
 import { JobQueue } from '../../job-queue/job-queue';
 import { JobQueueService } from '../../job-queue/job-queue.service';
 import { ConfigArgService } from '../helpers/config-arg/config-arg.service';
