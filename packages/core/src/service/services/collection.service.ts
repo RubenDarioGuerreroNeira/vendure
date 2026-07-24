@@ -96,7 +96,7 @@ export class CollectionService implements OnModuleInit {
         private translator: TranslatorService,
         private roleService: RoleService,
         private requestContextService: RequestContextService,
-    ) {}
+    ) { }
 
     /**
      * @internal
@@ -169,7 +169,7 @@ export class CollectionService implements OnModuleInit {
                             const translatedCollection = this.translator.translate(collection, ctx);
                             Logger.error(
                                 'An error occurred when processing the filters for ' +
-                                    `the collection "${translatedCollection.name}" (id: ${collection.id})`,
+                                `the collection "${translatedCollection.name}" (id: ${collection.id})`,
                             );
                             Logger.error(e.message);
                             continue;
@@ -713,6 +713,101 @@ export class CollectionService implements OnModuleInit {
             }
         }
         return filters;
+    }
+
+    /**
+     * Returns a Map of collection IDs to their associated product variants.
+     * This performs a single bulk query to get all variants for all provided collection IDs,
+     * avoiding N+1 query issues when resolving variants on multiple collections.
+     *
+     * Per-collection pagination: When `options.take` is provided, each collection's variant
+     * list is independently capped at that limit. When `options.skip` is provided, that many
+     * variants are skipped per collection. The query itself fetches all matching variants
+     * (using ignoreQueryLimits to bypass the default admin/shop list limit), and then
+     * per-collection take/skip is applied to the grouped results. This ensures that later
+     * collections are not truncated by a global limit applied across all collections.
+     */
+    async getProductVariantsForCollections(
+        ctx: RequestContext,
+        collectionIds: ID[],
+        options?: ListQueryOptions<ProductVariant>,
+        relations?: RelationPaths<ProductVariant>,
+    ): Promise<Map<string, ProductVariant[]>> {
+        if (collectionIds.length === 0) {
+            return new Map();
+        }
+
+        // Build the query with ignoreQueryLimits to avoid the default admin/shop list limit
+        // being applied globally across all collections. Per-collection pagination is applied
+        // after grouping the results below.
+        const qb = this.listQueryBuilder.build(ProductVariant, options ?? {}, {
+            relations: relations ?? ['taxCategory'],
+            channelId: ctx.channelId,
+            where: { deletedAt: IsNull() },
+            ctx,
+            entityAlias: 'productVariant',
+            ignoreQueryLimits: true,
+        });
+
+        // We explicitly join with the product to ensure we filter out soft-deleted products,
+        // matching the behavior of other collection-related variant queries.
+        qb.innerJoin('productvariant.collections', 'collection', 'collection.id IN (:...collectionIds)', {
+            collectionIds,
+        })
+            .andWhere('product.deletedAt IS NULL')
+            .addSelect('collection.id', 'collectionId')
+            .addSelect('productvariant.id', 'variantId');
+
+        const { entities: allVariants, raw: rawResults } = await qb.getRawAndEntities();
+
+        const variantsById = new Map<string, ProductVariant>(allVariants.map(v => [String(v.id), v]));
+
+        // Extract per-collection pagination parameters
+        const perCollectionTake = options?.take;
+        const perCollectionSkip = options?.skip ?? 0;
+
+        const variantsByCollectionId = new Map<string, ProductVariant[]>();
+        const seenInCollection = new Map<string, Set<string>>();
+        const perCollectionCount = new Map<string, number>();
+
+        for (const id of collectionIds) {
+            const idStr = String(id);
+            variantsByCollectionId.set(idStr, []);
+            seenInCollection.set(idStr, new Set());
+            perCollectionCount.set(idStr, 0);
+        }
+
+        for (const raw of rawResults) {
+            const variantId = String(raw.variantId);
+            const collectionId = String(raw.collectionId);
+            const variant = variantsById.get(variantId);
+
+            if (variant) {
+                const collectionVariants = variantsByCollectionId.get(collectionId);
+                const seenSet = seenInCollection.get(collectionId);
+                const count = perCollectionCount.get(collectionId) ?? 0;
+
+                if (collectionVariants && seenSet && !seenSet.has(variantId)) {
+                    seenSet.add(variantId);
+
+                    // Apply per-collection skip
+                    if (count < perCollectionSkip) {
+                        perCollectionCount.set(collectionId, count + 1);
+                        continue;
+                    }
+
+                    // Apply per-collection take
+                    if (perCollectionTake !== undefined && collectionVariants.length >= perCollectionTake) {
+                        continue;
+                    }
+
+                    perCollectionCount.set(collectionId, count + 1);
+                    collectionVariants.push(variant);
+                }
+            }
+        }
+
+        return variantsByCollectionId;
     }
 
     private chunkArray = <T>(array: T[], chunkSize: number): T[][] => {

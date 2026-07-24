@@ -480,7 +480,10 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
         // Helper to escape identifiers for the current database driver (handles PostgreSQL quoting)
         const escapeId = (name: string) => mainQb.connection.driver.escape(name);
         const escapeTablePath = (path: string) =>
-            path.split('.').map(segment => mainQb.connection.driver.escape(segment)).join('.');
+            path
+                .split('.')
+                .map(segment => mainQb.connection.driver.escape(segment))
+                .join('.');
 
         let existsQuery: string;
 

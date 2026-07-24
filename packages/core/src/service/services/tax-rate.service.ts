@@ -51,7 +51,7 @@ export class TaxRateService {
         private listQueryBuilder: ListQueryBuilder,
         private configService: ConfigService,
         private customFieldRelationService: CustomFieldRelationService,
-    ) {}
+    ) { }
 
     /**
      * When the app is bootstrapped, ensure the tax rate cache gets created
@@ -82,7 +82,7 @@ export class TaxRateService {
         }
         if (hasCategoryIdFilter) {
             effectiveRelations.push('category');
-            customPropertyMap.zoneId = 'category.id';
+            customPropertyMap.categoryId = 'category.id';
         }
         return this.listQueryBuilder
             .build(TaxRate, options, {
