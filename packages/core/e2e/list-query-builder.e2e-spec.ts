@@ -1428,6 +1428,56 @@ describe('ListQueryBuilder', () => {
         });
     });
 
+    // #5034 — ManyToOne custom property filters should use WHERE (not EXISTS)
+    // Since ManyToOne relations do not suffer from the AND-semantics problem
+    // (there is only one related entity per row), they should not be marked
+    // as EXISTS candidates. This test verifies that filtering on a ManyToOne
+    // single-hop custom property works correctly via a standard JOIN + WHERE.
+    describe('ManyToOne custom property filtering (uses WHERE, not EXISTS)', () => {
+        it('filters by parentLabel (ManyToOne single-hop)', async () => {
+            const { testEntities } = await shopClient.query(GET_LIST_WITH_ORDERS, {
+                options: {
+                    sort: { label: SortOrder.ASC },
+                    filter: {
+                        parentLabel: { eq: 'B' },
+                    },
+                },
+            });
+
+            // Entities A and D have parent B (label 'B')
+            expect(getItemLabels(testEntities.items)).toEqual(['A', 'D']);
+        });
+
+        it('filters by parentLabel with _and (ManyToOne does not use EXISTS)', async () => {
+            const { testEntities } = await shopClient.query(GET_LIST_WITH_ORDERS, {
+                options: {
+                    sort: { label: SortOrder.ASC },
+                    filter: {
+                        _and: [{ parentLabel: { eq: 'B' } }, { active: { eq: true } }],
+                    },
+                },
+            });
+
+            // Entities with parent B AND active=true: A and D are both active
+            expect(getItemLabels(testEntities.items)).toEqual(['A', 'D']);
+        });
+
+        it('filters by parentLabel combined with tagId in _and', async () => {
+            const { testEntities } = await shopClient.query(GET_LIST_WITH_TAGS, {
+                options: {
+                    sort: { label: SortOrder.ASC },
+                    filter: {
+                        _and: [{ parentLabel: { eq: 'B' } }, { tagId: { eq: 'T_1' } }],
+                    },
+                },
+            });
+
+            // Entities with parent B AND tag1: A has parent B and tag1
+            // D has parent B but no tag1
+            expect(getItemLabels(testEntities.items)).toEqual(['A']);
+        });
+    });
+
     describe('relations in customFields', () => {
         it('should resolve relations in customFields successfully', async () => {
             const { testEntities } = await shopClient.query(GET_LIST_WITH_CUSTOM_FIELD_RELATION, {

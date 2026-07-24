@@ -185,6 +185,15 @@ export function parseFilterParams<T extends VendureEntity>(
  * These fields require EXISTS subqueries for correct AND semantics when filtering across
  * multiple related rows.
  *
+ * Only single-hop paths (exactly 2 segments, e.g., 'facetValues.id') are considered.
+ * Multi-hop paths (e.g., 'orderRelation.customer.lastName') are excluded because they
+ * cannot be expressed as a simple EXISTS subquery and would fall back to a silent WHERE
+ * clause, potentially producing incorrect results with duplicate _and filters.
+ *
+ * ManyToOne relations are intentionally excluded because they do not suffer from the
+ * AND-semantics problem (there is only one related entity per row), so a standard
+ * JOIN + WHERE clause is correct and sufficient.
+ *
  * @see https://github.com/vendurehq/vendure/issues/3267
  */
 function getToManyRelationCustomProperties<T extends VendureEntity>(
@@ -208,13 +217,20 @@ function getToManyRelationCustomProperties<T extends VendureEntity>(
 
         // Parse the path to get the relation name (e.g., 'facetValues.id' -> 'facetValues')
         const pathParts = path.split('.');
-        if (pathParts.length < 2) {
+        // Only single-hop paths (exactly 2 segments) are supported for EXISTS subqueries.
+        // Multi-hop paths (e.g., 'relation.nested.value') cannot be expressed as a simple
+        // EXISTS subquery and would fall back to a silent WHERE clause, potentially
+        // producing incorrect results with duplicate _and filters.
+        if (pathParts.length !== 2) {
             continue;
         }
 
         const relationName = pathParts[0];
         const relationMetadata = metadata.findRelationWithPropertyPath(relationName);
 
+        // Only OneToMany and ManyToMany relations are candidates for EXISTS subqueries.
+        // ManyToOne relations are excluded because they do not suffer from the
+        // AND-semantics problem (there is only one related entity per row).
         if (relationMetadata && (relationMetadata.isOneToMany || relationMetadata.isManyToMany)) {
             toManyProperties.add(property);
         }

@@ -210,7 +210,7 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
     constructor(
         private connection: TransactionalConnection,
         private configService: ConfigService,
-    ) {}
+    ) { }
 
     /** @internal */
     onApplicationBootstrap(): any {
@@ -437,7 +437,11 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
         const { customPropertyPath } = condition.isExistsCondition;
         const pathParts = customPropertyPath.split('.');
 
-        if (pathParts.length < 2) {
+        // Only handle single-hop paths (e.g., 'facetValues.id'). Multi-hop paths like
+        // 'facetValues.term.id' cannot be expressed as a simple EXISTS subquery
+        // because the column being filtered is on a table reachable only through
+        // the related entity, not on the related entity itself.
+        if (pathParts.length !== 2) {
             return null;
         }
 
@@ -632,8 +636,8 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
         const takeLimit = ignoreQueryLimits
             ? Number.MAX_SAFE_INTEGER
             : apiType === 'admin'
-              ? adminListQueryLimit
-              : shopListQueryLimit;
+                ? adminListQueryLimit
+                : shopListQueryLimit;
         if (options.take && options.take > takeLimit) {
             throw new UserInputError('error.list-query-limit-exceeded', { limit: takeLimit });
         }

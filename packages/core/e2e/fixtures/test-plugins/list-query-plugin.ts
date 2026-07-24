@@ -220,7 +220,7 @@ export class TestEntityPrice extends VendureEntity {
 
 @Resolver()
 export class ListQueryResolver {
-    constructor(private listQueryBuilder: ListQueryBuilder) {}
+    constructor(private listQueryBuilder: ListQueryBuilder) { }
 
     @Query()
     testEntities(@Ctx() ctx: RequestContext, @Args() args: any) {
@@ -237,6 +237,7 @@ export class ListQueryResolver {
                 ],
                 customPropertyMap: {
                     customerLastName: 'orderRelation.customer.lastName',
+                    parentLabel: 'parent.label',
                     tagId: 'tags.id',
                     tagPriority: 'tags.priority',
                 },
@@ -342,6 +343,7 @@ const apiExtensions = gql`
 
     input TestEntityFilterParameter {
         customerLastName: StringOperators
+        parentLabel: StringOperators
         tagId: IDOperators
         tagPriority: NumberOperators
     }
@@ -378,7 +380,7 @@ export class ListQueryPlugin implements OnApplicationBootstrap {
         private requestContextService: RequestContextService,
         private customerService: CustomerService,
         private orderService: OrderService,
-    ) {}
+    ) { }
 
     async onApplicationBootstrap() {
         const count = await this.connection.rawConnection.getRepository(TestEntity).count();
