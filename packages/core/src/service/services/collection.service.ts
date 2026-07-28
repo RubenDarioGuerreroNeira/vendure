@@ -96,7 +96,7 @@ export class CollectionService implements OnModuleInit {
         private translator: TranslatorService,
         private roleService: RoleService,
         private requestContextService: RequestContextService,
-    ) { }
+    ) {}
 
     /**
      * @internal
@@ -169,7 +169,7 @@ export class CollectionService implements OnModuleInit {
                             const translatedCollection = this.translator.translate(collection, ctx);
                             Logger.error(
                                 'An error occurred when processing the filters for ' +
-                                `the collection "${translatedCollection.name}" (id: ${collection.id})`,
+                                    `the collection "${translatedCollection.name}" (id: ${collection.id})`,
                             );
                             Logger.error(e.message);
                             continue;
@@ -737,10 +737,16 @@ export class CollectionService implements OnModuleInit {
             return new Map();
         }
 
-        // Build the query with ignoreQueryLimits to avoid the default admin/shop list limit
-        // being applied globally across all collections. Per-collection pagination is applied
-        // after grouping the results below.
-        const qb = this.listQueryBuilder.build(ProductVariant, options ?? {}, {
+        // Extract per-collection pagination parameters BEFORE building the query,
+        // so that take/skip are NOT passed to listQueryBuilder.build() which would
+        // apply them globally across all collections.
+        const { take: perCollectionTake, skip: perCollectionSkip } = options ?? {};
+        const perCollectionTakeValue = perCollectionTake ?? undefined;
+        const optionsWithoutPagination = { ...(options ?? {}) };
+        delete (optionsWithoutPagination as any).take;
+        delete (optionsWithoutPagination as any).skip;
+
+        const qb = this.listQueryBuilder.build(ProductVariant, optionsWithoutPagination, {
             relations: relations ?? ['taxCategory'],
             channelId: ctx.channelId,
             where: { deletedAt: IsNull() },
@@ -751,20 +757,21 @@ export class CollectionService implements OnModuleInit {
 
         // We explicitly join with the product to ensure we filter out soft-deleted products,
         // matching the behavior of other collection-related variant queries.
-        qb.innerJoin('productvariant.collections', 'collection', 'collection.id IN (:...collectionIds)', {
+        qb.innerJoin('productVariant.collections', 'collection', 'collection.id IN (:...collectionIds)', {
             collectionIds,
         })
+            .innerJoin('productVariant.product', 'product')
             .andWhere('product.deletedAt IS NULL')
             .addSelect('collection.id', 'collectionId')
-            .addSelect('productvariant.id', 'variantId');
+            .addSelect('productVariant.id', 'variantId')
+            .addOrderBy('collection.id', 'ASC')
+            .addOrderBy('productVariant.id', 'ASC');
 
         const { entities: allVariants, raw: rawResults } = await qb.getRawAndEntities();
 
         const variantsById = new Map<string, ProductVariant>(allVariants.map(v => [String(v.id), v]));
 
-        // Extract per-collection pagination parameters
-        const perCollectionTake = options?.take;
-        const perCollectionSkip = options?.skip ?? 0;
+        const perCollectionSkipValue = perCollectionSkip ?? 0;
 
         const variantsByCollectionId = new Map<string, ProductVariant[]>();
         const seenInCollection = new Map<string, Set<string>>();
@@ -791,13 +798,16 @@ export class CollectionService implements OnModuleInit {
                     seenSet.add(variantId);
 
                     // Apply per-collection skip
-                    if (count < perCollectionSkip) {
+                    if (count < perCollectionSkipValue) {
                         perCollectionCount.set(collectionId, count + 1);
                         continue;
                     }
 
                     // Apply per-collection take
-                    if (perCollectionTake !== undefined && collectionVariants.length >= perCollectionTake) {
+                    if (
+                        perCollectionTakeValue !== undefined &&
+                        collectionVariants.length >= perCollectionTakeValue
+                    ) {
                         continue;
                     }
 
