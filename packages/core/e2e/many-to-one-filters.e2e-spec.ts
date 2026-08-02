@@ -1,4 +1,4 @@
-import { DefaultJobQueuePlugin, LanguageCode } from '@vendure/core';
+import { CollectionService, DefaultJobQueuePlugin, LanguageCode, RequestContextService } from '@vendure/core';
 import { createTestEnvironment } from '@vendure/testing';
 import { gql } from 'graphql-tag';
 import path from 'path';
@@ -85,7 +85,9 @@ describe('Collection Batch Loading Correctness', () => {
         `;
         const collectionsResult: any = await adminClient.query(GET_COLLECTIONS);
         const plants = collectionsResult.collections.items.find((c: any) => c.name === 'Plants');
-        plantsCollectionId = plants?.id;
+        expect(plants).toBeDefined();
+        expect(plants?.id).toBeTruthy();
+        plantsCollectionId = plants.id;
 
         // Create Electronics collection
         const CREATE_COLLECTION = gql`
@@ -141,30 +143,16 @@ describe('Collection Batch Loading Correctness', () => {
     it('returns empty map for empty input', async () => {
         // This test verifies that the batch loading service method handles
         // empty collection ID arrays gracefully by returning an empty Map.
-        const GET_COLLECTIONS_WITH_VARIANTS = gql`
-            query GetCollectionsWithVariants {
-                collections(options: { take: 10 }) {
-                    items {
-                        id
-                        name
-                        productVariants {
-                            items {
-                                id
-                            }
-                            totalItems
-                        }
-                    }
-                }
-            }
-        `;
-        const result: any = await adminClient.query(GET_COLLECTIONS_WITH_VARIANTS);
-        const collections = result.collections.items;
-        // Verify we get valid collections without errors when the query includes productVariants
-        expect(Array.isArray(collections)).toBe(true);
-        for (const collection of collections) {
-            expect(Array.isArray(collection.productVariants.items)).toBe(true);
-            expect(typeof collection.productVariants.totalItems).toBe('number');
-        }
+        const collectionService = server.app.get(CollectionService);
+        const requestContextService = server.app.get(RequestContextService);
+        const ctx = await requestContextService.create({ apiType: 'admin' });
+
+        const variantsMap = await collectionService.getProductVariantsForCollections(ctx, [], {
+            take: 10,
+        });
+
+        expect(variantsMap).toBeInstanceOf(Map);
+        expect(variantsMap.size).toBe(0);
     });
 
     it('returns variants grouped by collection', async () => {
