@@ -423,6 +423,14 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
      * - ManyToMany relations (uses junction table)
      * - OneToMany relations (direct foreign key on the related table)
      *
+     * ManyToOne relations are intentionally excluded because they do not suffer from the
+     * AND-semantics problem: there is only one related entity per row, so a standard
+     * JOIN + WHERE clause is sufficient.
+     *
+     * Only single-hop custom property paths (exactly 2 segments, e.g. 'facetValues.id') are
+     * supported for EXISTS subqueries. Multi-hop paths should be filtered out before
+     * reaching this method.
+     *
      * @see https://github.com/vendurehq/vendure/issues/3267
      */
     private buildExistsSubquery<T extends VendureEntity>(
@@ -442,7 +450,10 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
         // because the column being filtered is on a table reachable only through
         // the related entity, not on the related entity itself.
         if (pathParts.length !== 2) {
-            return null;
+            throw new Error(
+                `buildExistsSubquery received an unsupported customPropertyPath '${customPropertyPath}'. ` +
+                'Only single-hop *-to-Many paths are valid for EXISTS subqueries.'
+            );
         }
 
         const relationName = pathParts[0]; // e.g., 'facetValues' or 'orderLines'
@@ -558,8 +569,13 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
                 WHERE ${escapeId(relatedAlias)}.${escapeId(foreignKeyColumn)} = ${escapeId(mainQb.alias)}.${escapeId('id')} AND ${whereCondition}
             )`;
         } else {
-            // Not a *-to-Many relation, shouldn't happen but fall back gracefully
-            return null;
+            // Not a *-to-Many relation. This should have been excluded by the EXISTS
+            // candidate detection logic in parse-filter-params.ts, so reaching this branch
+            // indicates a bug in the filter classification.
+            throw new Error(
+                `buildExistsSubquery only supports OneToMany and ManyToMany relations. ` +
+                `Relation '${relationName}' on entity '${metadata.name}' is not supported.`
+            );
         }
 
         return {
