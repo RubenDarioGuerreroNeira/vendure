@@ -488,7 +488,7 @@
           "title": "Telemetry",
           "slug": "telemetry",
           "file": "docs/guides/how-to/telemetry/index.mdx",
-          "lastModified": "2026-05-22T15:38:26+02:00"
+          "lastModified": "2026-07-30T11:06:58Z"
         }
       ]
     },
@@ -650,7 +650,7 @@
           "title": "Localization",
           "slug": "localization",
           "file": "docs/guides/extending-the-dashboard/localization/index.mdx",
-          "lastModified": "2026-07-23T09:49:01+02:00"
+          "lastModified": "2026-07-31T11:47:50+02:00"
         },
         {
           "title": "Deployment",
@@ -4271,7 +4271,7 @@
                   "title": "VendureDashboardPlugin",
                   "slug": "vendure-dashboard-plugin",
                   "file": "docs/reference/dashboard/vite-plugin/vendure-dashboard-plugin.mdx",
-                  "lastModified": "2026-07-10T14:29:40+02:00"
+                  "lastModified": "2026-07-30T10:08:40+02:00"
                 }
               ],
               "lastModified": "2026-01-28T14:49:21+01:00"
