@@ -185,6 +185,7 @@ export const defaultConfig: RuntimeVendureConfig = {
         orderSellerStrategy: new DefaultOrderSellerStrategy(),
         guestCheckoutStrategy: new DefaultGuestCheckoutStrategy(),
         orderInterceptors: [],
+        usePessimisticOrderLocking: false,
     },
     paymentOptions: {
         paymentMethodEligibilityCheckers: [],

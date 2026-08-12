@@ -703,6 +703,22 @@ export interface OrderOptions {
      * @default []
      */
     orderInterceptors?: OrderInterceptor[];
+    /**
+     * @description
+     * When enabled, Vendure will apply pessimistic database row locks (`SELECT ... FOR UPDATE`)
+     * when reading an Order for mutations. This prevents "lost update" race conditions when
+     * multiple concurrent requests modify the same Order (e.g. `addItemToOrder`).
+     *
+     * This option only has an effect on databases which support row-level locking (PostgreSQL,
+     * MySQL, MariaDB, Aurora). On SQLite the lock is silently skipped.
+     *
+     * Enabling this can introduce a small performance overhead and the risk of deadlocks
+     * under very high concurrency, so it is disabled by default.
+     *
+     * @since 3.4.0
+     * @default false
+     */
+    usePessimisticOrderLocking?: boolean;
 }
 
 /**
@@ -1392,14 +1408,14 @@ export interface RuntimeVendureConfig extends Required<VendureConfig> {
 
 type DeepPartialSimple<T> = {
     [P in keyof T]?:
-        | null
-        | (T[P] extends Array<infer U>
-              ? U[]
-              : T[P] extends ReadonlyArray<infer X>
-                ? readonly X[]
-                : T[P] extends Type<any>
-                  ? T[P]
-                  : DeepPartialSimple<T[P]>);
+    | null
+    | (T[P] extends Array<infer U>
+        ? U[]
+        : T[P] extends ReadonlyArray<infer X>
+        ? readonly X[]
+        : T[P] extends Type<any>
+        ? T[P]
+        : DeepPartialSimple<T[P]>);
 };
 
 export type PartialVendureConfig = DeepPartialSimple<VendureConfig>;
