@@ -152,8 +152,10 @@ describe('Order race conditions', () => {
             query GetActiveOrder { activeOrder { totalQuantity } }
         `);
 
-        // The final quantity should be initial + concurrency (no lost updates)
-        expect(finalOrder.totalQuantity).toBe(initialQuantity + concurrency);
+        // Each request submits an absolute quantity of initialQuantity + quantityPerRequest.
+        // After serialization, the last request wins, so the final quantity should be
+        // initialQuantity + quantityPerRequest (not initialQuantity + concurrency).
+        expect(finalOrder.totalQuantity).toBe(initialQuantity + quantityPerRequest);
     });
 
     it('handles parallel applyCouponCode correctly', async () => {

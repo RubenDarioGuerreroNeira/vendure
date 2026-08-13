@@ -252,7 +252,7 @@ export class OrderService {
         qb.setFindOptions({
             relations: orderRelations,
             relationLoadStrategy: 'query',
-            lock: this.getLockMode(lock),
+            lock: this.getLockMode(ctx, lock),
         })
             .leftJoin('order.channels', 'channel')
             .where('order.id = :orderId', { orderId })
@@ -2276,10 +2276,19 @@ export class OrderService {
      * @description
      * Returns the lock mode if the current database driver supports it, otherwise returns undefined.
      * This prevents errors when using drivers like SQLite which do not support pessimistic locking.
+     *
+     * A pessimistic lock is only returned when the call is made within an active transaction.
+     * TypeORM requires pessimistic locks to be used inside a transaction; passing a lock to a
+     * non-transactional query will cause an error. Programmatic callers (background jobs, plugin
+     * services, lifecycle hooks) must wrap the call in a transaction via
+     * `TransactionalConnection.startTransaction()` or the `@Transaction()` resolver decorator.
      */
-    private getLockMode(lock?: {
-        mode: 'pessimistic_read' | 'pessimistic_write';
-    }): { mode: 'pessimistic_read' | 'pessimistic_write' } | undefined {
+    private getLockMode(
+        ctx: RequestContext,
+        lock?: {
+            mode: 'pessimistic_read' | 'pessimistic_write';
+        },
+    ): { mode: 'pessimistic_read' | 'pessimistic_write' } | undefined {
         const { usePessimisticOrderLocking } = this.configService.orderOptions;
         if (!usePessimisticOrderLocking) {
             return undefined;
@@ -2287,6 +2296,13 @@ export class OrderService {
         const supportedTypes = ['mysql', 'mariadb', 'postgres', 'aurora-mysql', 'aurora-postgres'];
         const dbType = this.connection.rawConnection.options.type;
         if (lock && supportedTypes.includes(dbType as any)) {
+            const entityManager = (ctx as unknown as Record<symbol, EntityManager | undefined>)[
+                TRANSACTION_MANAGER_KEY
+            ];
+            const queryRunner = entityManager?.queryRunner;
+            if (!queryRunner || queryRunner.isReleased) {
+                return undefined;
+            }
             return lock;
         }
         return undefined;
